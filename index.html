@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR Paper Printer</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --text-color: #34495e;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .language-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .language-toggle button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .language-toggle button:hover {
+            background-color: #2980b9;
+        }
+
+        .input-group {
+            display: grid;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .preview-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .preview {
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            padding: 0.5rem;
+            width: 152px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            font-size: 8pt;
+            word-wrap: break-word;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-size: 10pt;
+        }
+
+        .preview-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .preview-note {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 0.5rem;
+        }
+
+        button.print-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+
+        button.print-button:hover {
+            background-color: #2980b9;
+        }
+
+        [dir="rtl"] .language-toggle {
+            justify-content: flex-start;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="language-toggle">
+            <button id="lang-toggle">Switch to العربية</button>
+        </div>
+        <h1 id="title">MR Paper Printer</h1>
+        <div class="input-group">
+            <label for="text-input" id="input-label">Enter your text:</label>
+            <input type="text" id="text-input" placeholder="Type your text here">
+        </div>
+        <div class="preview-container">
+            <div class="preview-title" id="preview-title">Preview:</div>
+            <div class="preview">
+                <div class="preview-header" id="preview-header">Dr. Moamen Pharmacies</div>
+                <div class="preview-content" id="preview"></div>
+            </div>
+            <p class="preview-note" id="preview-note">(Preview scaled up 4x for visibility. Actual size: 38mm x 25mm)</p>
+        </div>
+        <button id="print-button" class="print-button">Print</button>
+    </div>
+
+    <script>
+        const langToggle = document.getElementById('lang-toggle');
+        const title = document.getElementById('title');
+        const inputLabel = document.getElementById('input-label');
+        const textInput = document.getElementById('text-input');
+        const previewTitle = document.getElementById('preview-title');
+        const previewHeader = document.getElementById('preview-header');
+        const preview = document.getElementById('preview');
+        const previewNote = document.getElementById('preview-note');
+        const printButton = document.getElementById('print-button');
+
+        let isArabic = false;
+
+        const translations = {
+            en: {
+                title: 'MR Paper Printer',
+                switchLang: 'Switch to العربية',
+                inputLabel: 'Enter your text:',
+                inputPlaceholder: 'Type your text here',
+                previewTitle: 'Preview:',
+                previewHeader: 'Dr. Moamen Pharmacies',
+                previewNote: '(Preview scaled up 4x for visibility. Actual size: 38mm x 25mm)',
+                printButton: 'Print'
+            },
+            ar: {
+                title: 'طابعة الورق',
+                switchLang: 'Switch to English',
+                inputLabel: 'أدخل النص الخاص بك:',
+                inputPlaceholder: 'اكتب النص هنا',
+                previewTitle: 'معاينة:',
+                previewHeader: 'صيدليات د. مؤمن',
+                previewNote: '(المعاينة مكبرة 4 مرات للوضوح. الحجم الفعلي: 38 مم × 25 مم)',
+                printButton: 'طباعة'
+            }
+        };
+
+        function updateLanguage() {
+            const lang = isArabic ? 'ar' : 'en';
+            document.documentElement.lang = lang;
+            document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+            langToggle.textContent = translations[lang].switchLang;
+            title.textContent = translations[lang].title;
+            inputLabel.textContent = translations[lang].inputLabel;
+            textInput.placeholder = translations[lang].inputPlaceholder;
+            previewTitle.textContent = translations[lang].previewTitle;
+            previewHeader.textContent = translations[lang].previewHeader;
+            previewNote.textContent = translations[lang].previewNote;
+            printButton.textContent = translations[lang].printButton;
+        }
+
+        langToggle.addEventListener('click', () => {
+            isArabic = !isArabic;
+            updateLanguage();
+        });
+
+        textInput.addEventListener('input', updatePreview);
+        printButton.addEventListener('click', handlePrint);
+
+        function updatePreview() {
+            preview.textContent = textInput.value;
+        }
+
+        function handlePrint() {
+            const content = preview.textContent;
+            const printWindow = window.open('', '_blank');
+            if (printWindow) {
+                printWindow.document.write(`
+                    <html lang="${isArabic ? 'ar' : 'en'}" dir="${isArabic ? 'rtl' : 'ltr'}">
+                        <head>
+                            <title>Print</title>
+                            <style>
+                                @page {
+                                    size: 38mm 25mm;
+                                    margin: 0;
+                                }
+                                body {
+                                    margin: 0;
+                                    padding: 0;
+                                    width: 38mm;
+                                    height: 25mm;
+                                    overflow: hidden;
+                                    font-family: Arial, sans-serif;
+                                }
+                                .print-content {
+                                    width: 100%;
+                                    height: 100%;
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    justify-content: flex-start;
+                                    text-align: center;
+                                    word-wrap: break-word;
+                                }
+                                .print-header {
+                                    font-weight: bold;
+                                    font-size: 10pt;
+                                    margin-bottom: 2mm;
+                                }
+                                .print-body {
+                                    font-size: 8pt;
+                                    flex-grow: 1;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    width: 100%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="print-content">
+                                <div class="print-header">${translations[isArabic ? 'ar' : 'en'].previewHeader}</div>
+                                <div class="print-body">${content}</div>
+                            </div>
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+            }
+        }
+
+        updateLanguage();
+    </script>
+</body>
+</html>
